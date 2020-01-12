@@ -1,17 +1,22 @@
 <template>
 	<div>
 		<el-container>
-			<el-header>xx公司客户关系管理系统</el-header>
+			<el-header>xx公司客户关系管理系统
+				<el-badge class="item">欢迎你 :{{sysUser.userName}} |
+				<el-link :underline="false" style=" color:#000000;">退出</el-link>
+				</el-badge>
+
+			</el-header>
 			<el-container>
 				<el-aside width="200px">
 					<el-menu router default-active="2" class="el-menu-vertical-demo" background-color="#D3DCE6" text-color="#333"
 					 active-text-color="#777">
 						<el-submenu index="1">
-							<template slot="title">							
+							<template slot="title">
 								<span>营销管理</span>
 							</template>
 							<el-menu-item index="/admin/salechancelist">销售机会管理</el-menu-item>
-							<el-menu-item index="/admin/newsList">客户开发计划</el-menu-item>
+							<el-menu-item index="admin/salechanceexecutelist">客户开发计划</el-menu-item>
 						</el-submenu>
 						<el-submenu index="2">
 							<template slot="title">
@@ -36,8 +41,12 @@
 		name: 'Admin',
 		data() {
 			return {
-				bodyHeight: 0
+				bodyHeight: 0,
+				sysUser: ''
 			}
+		},
+		created() {
+			this.sysUser = this.$getSessionStorage('sysUser');
 		},
 		mounted() {
 			document.getElementById('main').style.height = document.body.clientHeight - 120 + 'px';
@@ -95,5 +104,15 @@
 	.el-main {
 		background-color: #E9EEF3;
 		color: #333;
+	}
+
+	.item {
+		font-size: 16px;
+		float: right;
+		margin-top: 10px;
+		margin-right: 50px;
+	}
+	.el-link{
+		font-size: 16px;
 	}
 </style>
