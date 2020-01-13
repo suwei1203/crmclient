@@ -16,7 +16,7 @@
 								<span>营销管理</span>
 							</template>
 							<el-menu-item index="/admin/salechancelist">销售机会管理</el-menu-item>
-							<el-menu-item index="admin/salechanceexecutelist">客户开发计划</el-menu-item>
+							<el-menu-item index="/admin/salechanceexecutelist">客户开发计划</el-menu-item>
 						</el-submenu>
 						<el-submenu index="2">
 							<template slot="title">
