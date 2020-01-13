@@ -64,6 +64,7 @@
 					chanceStatus: 1,
 					chanceDueId:0
 				}
+
 			}
 		},
 		created() {
@@ -85,8 +86,10 @@
 					this.params.chanceTitle = '',
 					this.params.chanceLinkman = ''
 			},
-			salePlanFormulateView() {
-				this.$router.push("/admin/saleplanformulateview");
+			//跳转制定计划界面
+			salePlanFormulateView(chanceId) {
+				this.$setSessionStorage('chanceId',chanceId)
+				this.$router.push('/admin/saleplanformulateview');
 			},
 			handleCurrentChange(val) {
 				this.fenye(val);
