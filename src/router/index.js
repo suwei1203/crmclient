@@ -7,6 +7,7 @@ import InsertSaleChance from '../views/sale/InsertSaleChance.vue'
 import UpdateSaleChance from '../views/sale/UpdateSaleChance.vue'
 import SaleChanceList from '../views/sale/SaleChanceList.vue'
 import AppointSaleChance from '../views/sale/AppointSaleChance.vue'
+
 import SaleChanceExecuteList from '../views/sale/SaleChanceExecuteList.vue'
 import SalePlanFormulateView from '../views/sale/SalePlanFormulateView.vue'
 
