@@ -85,8 +85,8 @@
 			},
 			clearConditions() {
 				this.params.chanceCustName = '',
-					this.params.chanceTitle = '',
-					this.params.chanceLinkman = ''
+				this.params.chanceTitle = '',
+				this.params.chanceLinkman = ''
 			},
 			insertSaleChanceView() {
 				this.$router.push("/admin/insertsalechance");
