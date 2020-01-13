@@ -5,7 +5,7 @@
 			<el-breadcrumb-item>客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>制定开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-button type="primary" size="small" @click="appointSaleChance()">执行开发计划</el-button>
+		<el-button id="btn" type="primary" size="small" @click="appointSaleChance()">执行开发计划</el-button>
 
 		<el-form :inline="true" :model="saleChance" label-width="130px" style="margin-top: 15px;">
 			<el-form-item label="销售机会编号">
@@ -14,13 +14,13 @@
 			<el-form-item label="机会来源">
 				<el-input v-model="saleChance.chanceSource" disabled></el-input>
 			</el-form-item>
-			<el-form-item label="客户名称" >
+			<el-form-item label="客户名称">
 				<el-input v-model="saleChance.chanceCustName" disabled></el-input>
 			</el-form-item>
-			<el-form-item label="成功概率(%)" >
+			<el-form-item label="成功概率(%)">
 				<el-input v-model="saleChance.chanceRate" disabled></el-input>
 			</el-form-item>
-			<el-form-item label="概要" >
+			<el-form-item label="概要">
 				<el-input v-model="saleChance.chanceTitle" disabled></el-input>
 			</el-form-item>
 			<el-form-item label="联系人">
@@ -45,6 +45,19 @@
 				<el-input v-model="saleChance.chanceDueDate" disabled></el-input>
 			</el-form-item>
 		</el-form>
+		<el-button type="primary" size="small" @click="appointSaleChance()">执行开发计划</el-button>
+		<el-form :model="salePlan" label-width="90px" style="margin-top: 15px; width:2000px;">
+			<el-form-item label="已有计划" v-for="(item, index) in salePlan.list" :key="item.key" :prop="'list.' + index + '.planTodo'">
+				<el-input v-model="item.planTodo" @change="changeInput()"></el-input>
+				<el-button v-show="flag" style="margin-left:40px;" @click="updata(item,index)">保存</el-button>
+				<el-button @click.prevent="remove(item)" style="margin-left:40px;">删除</el-button>
+			</el-form-item>
+			<el-form-item label="新增计划">
+				<el-input v-model="newSalePlan.planTodo"></el-input>
+				<el-button @click="addDomain()" style="margin-left:40px;">保存</el-button>
+			</el-form-item>
+		</el-form>
+
 	</div>
 </template>
 
@@ -67,40 +80,48 @@
 					chanceDueDate: '',
 					chanceStatus: 0
 				},
-				userName: '11',
-				sysUser: [],
+				userName: '',
+				salePlan: {
+					list: []
+				},
+				//flag  当数据改变时 用于动态显示保存按钮
+				flag:false,
+					
 
-			}
+				newSalePlan: {
+					planChcId: 0,
+					planTodo: '',
+					planResult: ''
+				},
+				//此数据用于刷新组件
+				update: true
+			};
 		},
 		created() {
+			this.newSalePlan.planChcId = this.$getSessionStorage("chanceId");
 			this.$axios.post('selectSaleChanceByChanceId', {
 					chanceId: this.$getSessionStorage("chanceId")
 				})
 				.then((response) => {
-					console.log("aaa");
+
 					console.log(response);
 					this.saleChance = response.data;
-
-					this.saleChance.chanceDueDate = this.$getCurDate();
 				})
 				.catch((error) => {
 					console.log(error);
 				})
-
-
-
-			//查客户经理的用户
-			this.$axios.post('selectSysUserByCondition', {
-					userRoleId: 3
+			// 机会id下的所有计划 待修改
+			this.$axios.post('selectSalePlanByPlanChcId', {
+					planChcId: this.$getSessionStorage("chanceId")
 				})
 				.then((response) => {
-					console.log(response);
-					this.sysUser = response.data;
+					this.salePlan.list = response.data;
 				})
 				.catch((error) => {
 					console.log(error);
 				})
-			//根据id 查创建人的name
+
+			//根据id 查name
 			this.$axios.post('selectSysUserByCondition', {
 					userId: this.$getSessionStorage("userId")
 				})
@@ -111,6 +132,19 @@
 					console.log(error);
 				})
 
+		},
+		beforeMount() {
+			console.log('---');
+			console.log('beforeMount');
+		},
+		mounted() {
+			console.log('mounted');
+		},
+		beforeUpdate() {
+			console.log('beforeUpdate');
+		},
+		updated() {
+			console.log('updated');
 		},
 		methods: {
 			appointSaleChance() {
@@ -126,6 +160,61 @@
 					.catch((error) => {
 						console.log(error);
 					})
+			},
+			removeDomain(item) {
+				var index = this.dynamicValidateForm.domains.indexOf(item)
+				if (index !== -1) {
+					this.dynamicValidateForm.domains.splice(index, 1)
+				}
+			},
+			reload() {
+				// 移除组件
+				this.update = false
+				// 在组件移除后，重新渲染组件
+				// this.$nextTick可实现在DOM 状态更新后，执行传入的方法。
+				this.$nextTick(() => {
+					this.update = true
+				})
+			},
+			changeInput(){
+				this.flag=true;
+			},
+			addDomain() {
+				//删除
+				console.log(this.newSalePlan.planChcId);
+				console.log(this.newSalePlan.planTodo);
+				this.$axios.post('insertSalePlan', this.newSalePlan)
+					.then((response) => {
+						if (response.data == 1) {
+							alert('添加成功');
+
+							//重新得到数据
+							this.$axios.post('selectSalePlanByPlanChcId', {
+									planChcId: this.$getSessionStorage("chanceId")
+								})
+								.then((response) => {
+									this.salePlan.list = response.data;
+								})
+								.catch((error) => {
+									console.log(error);
+								})
+
+							this.newSalePlan.planTodo = '',
+
+								this.reload();
+						} else {
+							alert('添加失败');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+			},
+			updata(item,index){
+				console.log("aaa");	
+				console.log(this.backupSalePlanList[index].planTodo==item.planTodo);
+				console.log(this.backupSalePlanList[index].planTodo);
+				console.log(item.planTodo);
 			}
 		}
 	}
@@ -136,7 +225,7 @@
 		width: 400px;
 	}
 
-	.el-button {
+	#btn {
 		margin-top: 30px;
 		margin-bottom: 10px;
 		margin-left: 40px;
