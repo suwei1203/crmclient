@@ -38,11 +38,12 @@
 			</el-table-column>
 			<el-table-column fixed="right" label="操作" width="100">
 				<template slot-scope="scope">
-					
-					<el-button v-show="isFormulate(scope.row)"  class="el-icon-edit-outline" title="制定计划" @click="salePlanFormulateView(scope.row.chanceId)" type="text"
-					 size="medium"></el-button>
-					<el-button v-show="isExecute(scope.row)" class="el-icon-delete" title="执行计划" @click="salePlanExecuteView(scope.row.chanceId)" type="text" size="small"></el-button>
-					<el-button v-show="isExecute(scope.row)" class="el-icon-thumb" title="开发成功" @click="developsuc(scope.row.chanceId,scope.row.chanceCreateId)"
+
+					<el-button v-show="isFormulate(scope.row)" class="el-icon-edit-outline" title="制定计划" @click="salePlanFormulateView(scope.row.chanceId)"
+					 type="text" size="medium"></el-button>
+					<el-button v-show="isExecute(scope.row)" class="el-icon-d-arrow-right" title="执行计划" @click="salePlanExecuteView(scope.row.chanceId)"
+					 type="text" size="small"></el-button>
+					<el-button v-show="isExecute(scope.row)" class="el-icon-check" title="开发成功" @click="developsuc(scope.row.chanceId,scope.row.chanceCreateId)"
 					 type="text" size="small"></el-button>
 				</template>
 			</el-table-column>
@@ -63,9 +64,8 @@
 					chanceTitle: '',
 					chanceLinkman: '',
 					chanceStatus: 1,
-					chanceDueId:0
 				},
-				
+
 
 			}
 		},
@@ -73,25 +73,29 @@
 			this.fenye(1);
 		},
 		methods: {
-			
+
 			fenye(pageNum) {
 				this.$fenye('selectSaleChanceCount', 'selectSaleChancePaging', this.params, pageNum, this.$store.state.maxPageNum,
 					(response) => {
 						this.result = response;
 					})
 			},
-			//是否有制定开发计划权限
-			isFormulate(row){
-				return row.chanceDueId==this.$getSessionStorage('sysUser').userId||this.$getSessionStorage('sysUser').userRoleId==2;	
-					
-			},
-			//是否有执行权限
-			isExecute(row){
-				return row.chanceDueId==this.$getSessionStorage('sysUser').userId;
-			},
+			//多条件查询开发中的销售机会
 			selectSaleChanceByConditions() {
 				this.fenye(1);
 			},
+			
+			//是否有制定开发计划权限
+			isFormulate(row) {
+				return row.chanceDueId == this.$getSessionStorage('sysUser').userId || this.$getSessionStorage('sysUser').userRoleId ==
+					2;
+
+			},
+			//是否有执行权限
+			isExecute(row) {
+				return row.chanceDueId == this.$getSessionStorage('sysUser').userId;
+			},
+			
 			clearConditions() {
 				this.params.chanceCustName = '',
 					this.params.chanceTitle = '',
@@ -99,8 +103,47 @@
 			},
 			//跳转制定计划界面
 			salePlanFormulateView(chanceId) {
-				this.$setSessionStorage('chanceId',chanceId)
+				this.$setSessionStorage('chanceId', chanceId)
 				this.$router.push('/admin/saleplanformulateview');
+			},
+			// 开发成功
+			developsuccess() {
+				if (!confirm('确认开发成功？')) {
+					return;
+				}
+				//在用户信息表新增一条记录
+				this.clientInfo.clientCode = this.createClientCode(this.saleChance.chanceId);
+				this.clientInfo.clientName = this.saleChance.chanceCustName;
+				this.$axios.post('insertClientInfo', this.clientInfo)
+					.then((response) => {
+						if (response.data == 1) {
+							this.$router.push('/admin/salechanceexecutelist');
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+				//更改销售机会状态为 开发成功
+				this.saleChance.chanceStatus = 2;
+				this.$axios.post('updateSaleChance', this.saleChance)
+					.then((response) => {
+						if (response.data == 1) {
+							this.$router.push('/admin/salechancelist');
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+
+			},
+
+			salePlanExecuteView(chanceId) {
+				this.$setSessionStorage('chanceId', chanceId);
+				this.$router.push('/admin/saleplanexecuteview');
 			},
 			handleCurrentChange(val) {
 				this.fenye(val);
@@ -133,7 +176,7 @@
 				this.$setSessionStorage("chanceId", chanceId);
 				this.$setSessionStorage("chanceCreateId", chanceCreateId);
 			}
-		
+
 		}
 
 	}
