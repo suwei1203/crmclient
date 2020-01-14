@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item>客户开发计划</el-breadcrumb-item>
+			<el-breadcrumb-item :to="{ path: '/admin/salechancedeveloplist'}">客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>执行开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button id="btn" type="primary" size="small" @click="developsuccess()">开发成功</el-button>
@@ -56,7 +56,6 @@
 				<el-button v-show="numberarr.indexOf(index)!=-1" style="margin-left:40px;" @click="updateSalePlan(item,index)">保存</el-button>
 			</el-form-item>
 		</el-form>
-		<el-button style="margin-left:40px;" @click="test()">测试</el-button>
 	</div>
 </template>
 
