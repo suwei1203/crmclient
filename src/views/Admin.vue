@@ -2,21 +2,21 @@
 	<div>
 		<el-container>
 			<el-header>xx公司客户关系管理系统
-				<el-badge class="item">欢迎你 :{{sysUser.userName}} |
+				<el-badge class="item">欢迎你 :{{$getSessionStorage('sysUser').userName}} |
 				<el-button @click="signOut()" type="text">安全退出</el-button>
 				</el-badge>
-
 			</el-header>
 			<el-container>
 				<el-aside width="200px">
-					<el-menu router default-active="2" class="el-menu-vertical-demo" background-color="#D3DCE6" text-color="#333"
-					 active-text-color="#777">
-						<el-submenu index="1">
+					<!-- router属性   激活导航时以 index 作为 path 进行路由跳转-->
+					<el-menu router class="el-menu-vertical-demo" background-color="#D3DCE6" active-text-color="#777">
+						<el-submenu>
+							<!-- 分组标签 -->
 							<template slot="title">
 								<span>营销管理</span>
 							</template>
 							<el-menu-item index="/admin/salechancelist">销售机会管理</el-menu-item>
-							<el-menu-item index="/admin/salechanceexecutelist">客户开发计划</el-menu-item>
+							<el-menu-item index='/admin/salechancedeveloplist'>客户开发计划</el-menu-item>
 						</el-submenu>
 						<el-submenu index="2">
 							<template slot="title">
@@ -38,15 +38,10 @@
 
 <script>
 	export default {
-		name: 'Admin',
 		data() {
 			return {
 				bodyHeight: 0,
-				sysUser: ''
 			}
-		},
-		created() {
-			this.sysUser = this.$getSessionStorage('sysUser');
 		},
 		mounted() {
 			document.getElementById('main').style.height = document.body.clientHeight - 120 + 'px';
