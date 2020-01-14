@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item>销售机会管理</el-breadcrumb-item>
+			<el-breadcrumb-item :to="{ path: '/admin/salechancelist'}">销售机会管理</el-breadcrumb-item>
 			<el-breadcrumb-item>创建销售机会</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button type="primary" size="small" @click="insertSaleChance()">创建</el-button>
@@ -66,6 +66,7 @@
 		},
 		created() {
 			this.saleChance.chanceCreateDate = this.$getCurDate();
+			// 获取最新的销售机会自增主键
 			this.$axios.post('selectLastChanceId')
 				.then((response) => {
 					this.saleChance.chanceId = response.data;
@@ -77,6 +78,7 @@
 			this.saleChance.chanceCreateId = this.$getSessionStorage("sysUser").userId;
 		},
 		methods: {
+			// 创建销售机会
 			insertSaleChance() {
 				if (this.saleChance.chanceCustName == '') {
 					alert('客户名称不能为空！');
