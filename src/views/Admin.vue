@@ -3,7 +3,7 @@
 		<el-container>
 			<el-header>xx公司客户关系管理系统
 				<el-badge class="item">欢迎你 :{{sysUser.userName}} |
-				<el-link :underline="false" style=" color:#000000;">退出</el-link>
+				<el-button @click="signOut()" type="text">安全退出</el-button>
 				</el-badge>
 
 			</el-header>
@@ -63,7 +63,11 @@
 			}
 		},
 		methods: {
-
+			signOut(){
+				this.$removeSessionStorage('sysUser');
+				this.$removeSessionStorage('chanceId');
+				this.$router.push('/login');
+			}
 		}
 	}
 </script>
