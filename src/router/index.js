@@ -10,6 +10,7 @@ import AppointSaleChance from '../views/sale/AppointSaleChance.vue'
 
 import SaleChanceExecuteList from '../views/sale/SaleChanceExecuteList.vue'
 import SalePlanFormulateView from '../views/sale/SalePlanFormulateView.vue'
+import SalePlanExecuteView from '../views/sale/SalePlanExecuteView.vue'
 
 
 Vue.use(VueRouter)
@@ -50,7 +51,7 @@ const routes = [{
 				path: '/admin/appointsalechance',
 				name: 'AppointSaleChance',
 				component: AppointSaleChance
-			},{
+			}, {
 				path: '/admin/salechanceexecutelist',
 				name: 'SaleChanceExecuteList',
 				component: SaleChanceExecuteList
@@ -59,8 +60,13 @@ const routes = [{
 				path: '/admin/saleplanformulateview',
 				name: 'SalePlanFormulateView',
 				component: SalePlanFormulateView
+			},
+			{
+				path: '/admin/saleplanexecuteview',
+				name: 'SalePlanExecuteView',
+				component: SalePlanExecuteView
 			}
-			
+
 		]
 	}
 ]
