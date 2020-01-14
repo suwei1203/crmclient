@@ -41,13 +41,13 @@
 					alert('密码不能为空！');
 					return;
 				}
-				
+				//查询系统用户表
 				this.$axios.post('selectSysUserByuserNameByuserPassword', this.sysUser)
 					.then((response) => {
-						if(response.data==''){
+						if (response.data == '') {
 							alert('用户名或密码输入错误！');
-						}else{
-							this.$setSessionStorage('sysUser',response.data);
+						} else {
+							this.$setSessionStorage('sysUser', response.data);
 							this.$router.push('/admin');
 						}
 					})
@@ -82,6 +82,6 @@
 		width: 350px;
 		margin: 0 auto;
 		margin-top: 100px;
-		background-color:#ACD6FF;
+		background-color: #ACD6FF;
 	}
 </style>
