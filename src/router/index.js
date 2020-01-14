@@ -8,7 +8,7 @@ import UpdateSaleChance from '../views/sale/UpdateSaleChance.vue'
 import SaleChanceList from '../views/sale/SaleChanceList.vue'
 import AppointSaleChance from '../views/sale/AppointSaleChance.vue'
 
-import SaleChanceExecuteList from '../views/sale/SaleChanceExecuteList.vue'
+import SaleChanceDevelopList from '../views/sale/SaleChanceDevelopList.vue'
 import SalePlanFormulateView from '../views/sale/SalePlanFormulateView.vue'
 import SalePlanExecuteView from '../views/sale/SalePlanExecuteView.vue'
 
@@ -34,34 +34,41 @@ const routes = [{
 				name: 'HelloWorld',
 				component: HelloWorld
 			}, {
+				//添加销售机会组件
 				path: '/admin/insertsalechance',
 				name: 'InsertSaleChance',
 				component: InsertSaleChance
 			}, {
+				//修改销售机会组件
 				path: '/admin/updatesalechance',
 				name: 'UpdateSaleChance',
 				component: UpdateSaleChance
 			},
 			{
+				//销售机会列表组件
 				path: '/admin/salechancelist',
 				name: 'SaleChanceList',
 				component: SaleChanceList
 			},
 			{
+				//指派销售机会组件
 				path: '/admin/appointsalechance',
 				name: 'AppointSaleChance',
 				component: AppointSaleChance
 			}, {
-				path: '/admin/salechanceexecutelist',
-				name: 'SaleChanceExecuteList',
-				component: SaleChanceExecuteList
+				//销售机会开发列表组件
+				path: '/admin/salechancedeveloplist',
+				name: 'SaleChanceDevelopList',
+				component: SaleChanceDevelopList
 			},
 			{
+				//销售机会制定组件
 				path: '/admin/saleplanformulateview',
 				name: 'SalePlanFormulateView',
 				component: SalePlanFormulateView
 			},
 			{
+				//销售机会执行组件
 				path: '/admin/saleplanexecuteview',
 				name: 'SalePlanExecuteView',
 				component: SalePlanExecuteView
