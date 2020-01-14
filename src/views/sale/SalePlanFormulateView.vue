@@ -5,7 +5,7 @@
 			<el-breadcrumb-item>客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>制定开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-button id="btn" type="primary" size="small" @click="saleChanceExecuteView()">执行开发计划</el-button>
+		<el-button v-show="isExecute()" id="btn" type="primary" size="small" @click="salePlanExecuteView(saleChance.chanceId)">执行开发计划</el-button>
 
 		<el-form :inline="true" :model="saleChance" label-width="130px" style="margin-top: 15px;">
 			<el-form-item label="销售机会编号">
@@ -47,7 +47,7 @@
 		</el-form>
 		
 		<el-form :model="salePlan" label-width="90px" style="margin-top: 15px; width:2000px;">
-			<el-form-item label="已有计划" v-for="(item, index) in salePlan.list">
+			<el-form-item label="已有计划" v-for="(item, index) in salePlan.list" :key="index">
 				<el-input v-model="item.planTodo" @change="changeContent(index)"></el-input>
 				<el-button v-show="numberarr.indexOf(index)!=-1" style="margin-left:40px;" @click="updateSalePlan(item,index)">保存</el-button>
 				<el-button @click="delSalePlan(item)" style="margin-left:40px;">删除</el-button>
@@ -123,23 +123,17 @@
 					console.log(error);
 				})
 
-			//根据id 查name
-			// this.$axios.post('selectSysUserByCondition', {
-			// 		userId: this.$getSessionStorage("userId")
-			// 	})
-			// 	.then((response) => {
-			// 		console.log(response);
-			// 		this.userName = response.data[0].userName;
-			// 	})
-			// 	.catch((error) => {
-			// 		console.log(error);
-			// 	})
-
 		},
 	
 		methods: {
-			saleChanceExecuteView() {
-				alert("跳转");
+			//是否有执行计划权限
+			isExecute(){
+				return this.saleChance.chanceDueId==this.$getSessionStorage('sysUser').userId;
+			},
+			
+			salePlanExecuteView(chanceId) {
+				this.$setSessionStorage('chanceId',chanceId);
+				this.$router.push('/admin/saleplanexecuteview');
 			},
 			
 			reload() {
