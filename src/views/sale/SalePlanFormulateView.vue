@@ -130,11 +130,13 @@
 			isExecute(){
 				return this.saleChance.chanceDueId==this.$getSessionStorage('sysUser').userId;
 			},
-			
+			//跳转到执行计划组件
 			salePlanExecuteView(chanceId) {
 				this.$setSessionStorage('chanceId',chanceId);
 				this.$router.push('/admin/saleplanexecuteview');
 			},
+			
+			
 			
 			reload() {
 				// 移除组件
