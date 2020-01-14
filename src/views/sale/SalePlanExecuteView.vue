@@ -7,7 +7,7 @@
 		</el-breadcrumb>
 		<el-button id="btn" type="primary" size="small" @click="developsuccess()">开发成功</el-button>
 		<el-button id="btn" type="primary" size="small" @click="salePlanFormulateView()">制定开发计划</el-button>
-		<el-button id="btn" type="primary" size="small" @click="">终止开发</el-button>
+		<el-button id="btn" type="primary" size="small" @click="developfail()">终止开发</el-button>
 
 		<el-form :inline="true" :model="saleChance" label-width="130px" style="margin-top: 15px;">
 			<el-form-item label="销售机会编号">
@@ -95,17 +95,18 @@
 				},
 				//此数据用于刷新组件
 				update: true,
-				clientInfo:{
-					clientCode:'',
-					clientName:'',
-					clientCustId:0
-					
+				clientInfo: {
+					clientCode: '',
+					clientName: '',
+					clientCustId: 0
+
 				}
 			};
 		},
 		created() {
-			
+
 			this.userName = this.$getSessionStorage("sysUser").userName;
+
 			//此条代码赋值作用？
 			this.savedSalePlan.planChcId = this.$getSessionStorage("chanceId");
 			this.$axios.post('selectSaleChanceByChanceId', {
@@ -131,32 +132,36 @@
 		},
 
 		methods: {
-			test(){
-				//生成3位流水号
+			createClientCode(chanceId) {
+				//客户编号（KH + 六位日期数字 + 三位数字流水号）
+				//3位流水号
 				let number;
-				if(this.saleChance.chanceId<10){
-					number='00'+this.saleChance.chanceId;
-				}else if(this.saleChance.chanceId<100){
-					number='0'+this.saleChance.chanceId;
-				}else if(this.saleChance.chanceId<1000){
-					number=this.saleChance.chanceId;
-				}else{
-					number=this.saleChance.chanceId.toString().slice(0,3);
+				if (chanceId < 10) {
+					number = '00' + chanceId;
+				} else if (chanceId < 100) {
+					number = '0' + this.saleChance.chanceId;
+				} else if (chanceId < 1000) {
+					number = chanceId;
+				} else {
+					number = chanceId.toString().slice(0, 3);
 				}
-				let time=this.$getCurDate();
-				let year=time.slice(0,4);
-				let month=time.slice(5,7);
-				let day=time.slice(8,10);
-				this.clientInfo.clientCode='KH'+year+month+day+number;
-				console.log(this.clientInfo.clientCode);
-				console.log(this.clientInfo.clientCode.length);
+				//六位日期数字
+				let time = this.$getCurDate();
+				let year = time.slice(0, 4);
+				let month = time.slice(5, 7);
+
+				return 'KH' + year + month + number;
+
 			},
-			developsuccess(){
+			// 开发成功
+			developsuccess() {
 				if (!confirm('确认开发成功？')) {
 					return;
 				}
-				this.saleChance.chanceStatus = 2;
-				this.$axios.post('updateSaleChance', this.saleChance)
+				//在用户信息表新增一条记录
+				this.clientInfo.clientCode = this.createClientCode(this.saleChance.chanceId);
+				this.clientInfo.clientName = this.saleChance.chanceCustName;
+				this.$axios.post('insertClientInfo', this.clientInfo)
 					.then((response) => {
 						if (response.data == 1) {
 							this.$router.push('/admin/salechanceexecutelist');
@@ -167,27 +172,52 @@
 					.catch((error) => {
 						console.log(error);
 					})
-					
+				//更改销售机会状态为 开发成功
+				this.saleChance.chanceStatus = 2;
+				this.$axios.post('updateSaleChance', this.saleChance)
+					.then((response) => {
+						if (response.data == 1) {
+							this.$router.push('/admin/salechancelist');
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+
 			},
-		
-			salePlanFormulateView(){
+			//开发失败
+			developfail() {
+				if (!confirm('确认开发失败？')) {
+					return;
+				}
+
+				//更改销售机会状态为 开发失败
+				this.saleChance.chanceStatus = 3;
+				this.$axios.post('updateSaleChance', this.saleChance)
+					.then((response) => {
+						if (response.data == 1) {
+							this.$router.push('/admin/salechancelist');
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+
+			},
+			//跳转到制定计划组件
+			salePlanFormulateView() {
 				this.$router.push('/admin/saleplanformulateview');
-			}
-			//开发失败位置留用
-			,
-			reload() {
-				// 移除组件
-				this.update = false
-				// 在组件移除后，重新渲染组件
-				// this.$nextTick可实现在DOM 状态更新后，执行传入的方法。
-				this.$nextTick(() => {
-					this.update = true
-				})
 			},
-			//执行效果内容改变时触发 
+
+			//执行效果内容改变时触发 显示出一个保存按钮 
 			changeContent(index) {
 				this.numberarr.push(index);
 			},
+
 			//移除数组中指定数值的元素 用于动态显示保存按钮
 			removenum(arr, num) {
 				for (let i = 0; i < arr.length; i++) {
@@ -196,12 +226,9 @@
 					}
 				}
 			},
-			salePlanFormulateView(){
-				this.$router.push('/admin/saleplanformulateview');
-			}
-			,
+			//修改销售计划执行结果
 			updateSalePlan(item, index) {
-				if(item.planResult==null){
+				if (item.planResult == null) {
 					alert(执行效果不能更改为空);
 					return;
 				}
