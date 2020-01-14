@@ -2,11 +2,10 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item>销售机会管理</el-breadcrumb-item>
+			<el-breadcrumb-item :to="{ path: '/admin/salechancelist'}">销售机会管理</el-breadcrumb-item>
 			<el-breadcrumb-item>指派销售机会</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button type="primary" size="small" @click="appointSaleChance()">指派</el-button>
-
 		<el-form :inline="true" :model="saleChance" label-width="130px" style="margin-top: 15px;">
 			<el-form-item label="销售机会编号">
 				<el-input v-model="saleChance.chanceId" disabled></el-input>
@@ -40,7 +39,7 @@
 			</el-form-item>
 			<el-form-item label="指派给" required>
 				<el-select v-model="saleChance.chanceDueId" placeholder="请选择指派人" style="width:400px;">
-					<el-option v-for="item in sysUser" :key="item.userId" :label="item.userName" :value="item.userId">
+					<el-option v-for="item in sysUserManager" :key="item.userId" :label="item.userName" :value="item.userId">
 					</el-option>
 				</el-select>
 			</el-form-item>
@@ -70,53 +69,37 @@
 					chanceDueDate: '',
 					chanceStatus: 0
 				},
-				userName: '11',
-				sysUser: [],
-
+				userName: '',
+				sysUserManager: [],
 			}
 		},
 		created() {
+			// 获取要修改的销售机会信息
 			this.$axios.post('selectSaleChanceByChanceId', {
 					chanceId: this.$getSessionStorage("chanceId")
 				})
 				.then((response) => {
-					console.log("aaa");
-					console.log(response);
 					this.saleChance = response.data;
-
 					this.saleChance.chanceDueDate = this.$getCurDate();
 				})
 				.catch((error) => {
 					console.log(error);
 				})
-
-
-
-			//查客户经理的用户
+			//查询职责为客户经理的系统用户
 			this.$axios.post('selectSysUserByCondition', {
 					userRoleId: 3
 				})
 				.then((response) => {
-					console.log(response);
-					this.sysUser = response.data;
+					this.sysUserManager = response.data;
 				})
 				.catch((error) => {
 					console.log(error);
 				})
-			//根据id 查创建人的name
-			this.$axios.post('selectSysUserByCondition', {
-					userId: this.$getSessionStorage("userId")
-				})
-				.then((response) => {
-					this.userName = response.data[0].userName;
-				})
-				.catch((error) => {
-					console.log(error);
-				})
-
 		},
 		methods: {
+			//指派销售机会
 			appointSaleChance() {
+				//销售状态为1 开发中
 				this.saleChance.chanceStatus = 1;
 				this.$axios.post('updateSaleChance', this.saleChance)
 					.then((response) => {
