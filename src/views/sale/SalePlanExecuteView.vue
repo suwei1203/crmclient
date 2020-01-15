@@ -105,8 +105,6 @@
 		created() {
 
 			this.userName = this.$getSessionStorage("sysUser").userName;
-
-			//此条代码赋值作用？
 			this.savedSalePlan.planChcId = this.$getSessionStorage("chanceId");
 			this.$axios.post('selectSaleChanceByChanceId', {
 					chanceId: this.$getSessionStorage("chanceId")
@@ -118,7 +116,7 @@
 					console.log(error);
 				})
 			// 销售机会下的所有已存在的计划 
-			this.$axios.post('selectSalePlanByPlanChcId', {
+			this.$axios.post('selectSalePlanByCondition', {
 					planChcId: this.$getSessionStorage("chanceId")
 				})
 				.then((response) => {
@@ -163,7 +161,7 @@
 				this.$axios.post('insertClientInfo', this.clientInfo)
 					.then((response) => {
 						if (response.data == 1) {
-							this.$router.push('/admin/salechanceexecutelist');
+					
 						} else {
 							alert('发生错误');
 						}
@@ -224,25 +222,29 @@
 						arr.splice(i, 1);
 					}
 				}
+				this.numberarr=arr;
 			},
 			//修改销售计划执行结果
 			updateSalePlan(item, index) {
 				if (item.planResult == null) {
 					alert(执行效果不能更改为空);
-					return;
 				}
 				this.$axios.post('updateSalePlan', item)
 					.then((response) => {
 						if (response.data == 1) {
-							console.log(this.numberarr);
+							//console.log(this.numberarr);
 							alert('修改成功');
 							this.removenum(this.numberarr, index);
 							//重新得到数据
-							this.$axios.post('selectSalePlanByPlanChcId', {
-									planChcId: this.$getSessionStorage("chanceId")
+							this.$axios.post('selectSalePlanByCondition', {
+									planId: item.planId
 								})
 								.then((response) => {
-									this.salePlan.list = response.data;
+									console.log(response);
+									//测试
+									this.$set(this.salePlan.list,index,response.data[0]);
+									//this.salePlan.list[index] = response.data[0];
+									console.log(this.salePlan);
 								})
 								.catch((error) => {
 									console.log(error);
@@ -256,6 +258,9 @@
 					})
 			},
 
+		},
+		mounted () {
+		　　this.$set(this.student,"age", 24)
 		}
 	}
 </script>
