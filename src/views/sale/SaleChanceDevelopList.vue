@@ -36,11 +36,11 @@
 			</el-table-column>
 			<el-table-column fixed="right" label="操作" width="100">
 				<template slot-scope="scope">
-					<el-button v-show="isFormulate(scope.row)" class="el-icon-edit-outline" title="制定计划" @click="salePlanFormulateView(scope.row.chanceId)"
+					<el-button v-show="isFormulate(scope.row)" class="el-icon-edit-outline" title="制定计划" @click="salePlanFormulateView(scope.row)"
 					 type="text" size="medium"></el-button>
 					<el-button v-show="isExecute(scope.row)" class="el-icon-d-arrow-right" title="执行计划" @click="salePlanExecuteView(scope.row.chanceId)"
 					 type="text" size="small"></el-button>
-					<el-button v-show="isExecute(scope.row)" class="el-icon-check" title="开发成功" @click="developsuc(scope.row.chanceId,scope.row.chanceCreateId)"
+					<el-button v-show="isExecute(scope.row)" class="el-icon-check" title="开发成功" @click="developsuc(scope.row)"
 					 type="text" size="small"></el-button>
 				</template>
 			</el-table-column>
@@ -67,11 +67,10 @@
 					clientLinkmanSex:0,
 					clientLinkmanJob:'',
 					clientLinkmanTel:'',
-					clientCode:'',
-					
-					
-					
-				}
+					clientCode:''
+				},
+				clientInfo:'',
+				clientCode:''
 			}
 		},
 		created() {
@@ -104,9 +103,10 @@
 				return row.chanceDueId == this.$getSessionStorage('sysUser').userId;
 			},
 			//跳转制定计划界面
-			salePlanFormulateView(chanceId) {
-				this.$setSessionStorage('chanceId', chanceId)
-				this.$router.push('/admin/saleplanformulateview');
+			salePlanFormulateView(saleChance) {
+				 console.log(saleChance)
+				//this.$setSessionStorage('chanceId', chanceId)
+				//this.$router.push('/admin/saleplanformulateview');
 			},
 			//跳转执行计划界面
 			salePlanExecuteView(chanceId) {
@@ -114,20 +114,24 @@
 				this.$router.push('UpdateSaleChance');
 			},
 			// 开发成功
-			developsuccess() {
+			developsuc(saleChance) {
 				if (!confirm('确认开发成功？')) {
 					return;
 				}
+				this.$setSessionStorage('chanceId',saleChance.chanceId);
+				console.log("---");
 				//创建当前客户的客户信息表方法
-				this.createClientInfo();
+				this.createClientInfo(saleChance);
+				console.log("111");
 				//创建当前客户的联系人表的方法
-				this.createClientLinkman();
+				this.createClientLinkman(saleChance);
 				//更改销售机会状态为 开发成功
-				this.saleChance.chanceStatus = 2;
-				this.$axios.post('updateSaleChance', this.saleChance)
+				console.log("222");
+				saleChance.chanceStatus = 2;
+				this.$axios.post('updateSaleChance',saleChance)
 					.then((response) => {
 						if (response.data == 1) {
-
+							console.log("销售机会表成功")
 						} else {
 							alert('发生错误');
 						}
@@ -139,13 +143,16 @@
 
 			},
 			// 封装  创建当前客户的客户信息表方法
-			createClientInfo(){
-				this.clientInfo.clientCode = this.createClientCode(this.saleChance.chanceId);
-				this.clientInfo.clientName = this.saleChance.chanceCustName;
+			createClientInfo(saleChance){
+				
+				this.clientInfo.clientCode = this.createClientCode(saleChance.chanceId);
+				
+				this.clientInfo.clientName = saleChance.chanceCustName;
+				this.clientInfo.clientCustId=0;
 				this.$axios.post('insertClientInfo', this.clientInfo)
 					.then((response) => {
 						if (response.data == 1) {
-				
+							console.log("客户信息表成功")
 						} else {
 							alert('发生错误');
 							
@@ -156,24 +163,27 @@
 					})
 			},
 			// 封装  创建当前客户的联系人表的方法
-			createClientLinkman(){
+			createClientLinkman(saleChance){
 				// 给参数赋值
-				this.clientLinkman.clientLinkmanName=this.result.data.chanceLinkman;
-				if(result.data.chanceLinkman==''){
+				this.clientLinkman.clientLinkmanName=saleChance.chanceLinkman;
+				if(saleChance.chanceLinkman==''){
 					this.clientLinkman.clientLinkmanName='暂无';
 				}
 				this.clientLinkman.clientLinkmanSex=0;
-				this.clientLinkman.clientLinkmanTel=this.result.data.chanceTel;
-				if(result.data.clientLinkmanTel==''){
+				this.clientLinkman.clientLinkmanTel=saleChance.chanceTel;
+				if(saleChance.clientLinkmanTel==''){
 					this.clientLinkman.clientLinkmanTel='暂无';
 				}
 				this.clientLinkman.clientLinkmanJob='暂无';
-				this.clientLinkman.clientCode=this.createClientCode(this.saleChance.chanceId);
+				this.createClientCode(saleChance.chanceId);
 				
+				//this.clientLinkman.clientCode=this.createClientCode(saleChance.chanceId);
+				console.log("aaaa11");
+				console.log(saleChance);
 				this.$axios.post('insertClientInfo', this.clientInfo)
 					.then((response) => {
 						if (response.data == 1) {
-				
+						console.log("联系人表成功");
 						} else {
 							alert('发生错误');
 						}
@@ -187,25 +197,30 @@
 			handleCurrentChange(val) {
 				this.fenye(val);
 			},
-			//客户编号（KH + 六位日期数字 + 三位数字流水号）
+			// 生成客户编号（KH + 六位日期数字 + 三位数字流水号）
 			createClientCode(chanceId) {		
 				//3位流水号
 				let number;
 				if (chanceId < 10) {
 					number = '00' + chanceId;
 				} else if (chanceId < 100) {
-					number = '0' + this.saleChance.chanceId;
+					number = '0' +chanceId;
 				} else if (chanceId < 1000) {
 					number = chanceId;
 				} else {
 					number = chanceId.toString().slice(0, 3);
 				}
+				console.log("ccc");
+				console.log(number);
 				//六位日期数字
 				let time = this.$getCurDate();
 				let year = time.slice(0, 4);
 				let month = time.slice(5, 7);
-			
-				return 'KH' + year + month + number;
+				
+				this.clientCode== 'KH' + year + month + number;
+				console.log("lll");
+				console.log(typeof this.clientCode);
+				console.log(this.clientCode);
 			
 			},
 		}
