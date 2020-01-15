@@ -38,7 +38,7 @@
 				<template slot-scope="scope">
 					<el-button v-show="isFormulate(scope.row)" class="el-icon-edit-outline" title="制定计划" @click="salePlanFormulateView(scope.row)"
 					 type="text" size="medium"></el-button>
-					<el-button v-show="isExecute(scope.row)" class="el-icon-d-arrow-right" title="执行计划" @click="salePlanExecuteView(scope.row.chanceId)"
+					<el-button v-show="isExecute(scope.row)" class="el-icon-d-arrow-right" title="执行计划" @click="salePlanExecuteView(scope.row)"
 					 type="text" size="small"></el-button>
 					<el-button v-show="isExecute(scope.row)" class="el-icon-check" title="开发成功" @click="developsuc(scope.row)"
 					 type="text" size="small"></el-button>
@@ -69,8 +69,11 @@
 					clientLinkmanTel:'',
 					clientCode:''
 				},
-				clientInfo:'',
-				clientCode:''
+				clientInfo:{
+					clientCode:'',
+					clientName:'',
+					clientCustId:0
+				}
 			}
 		},
 		created() {
@@ -78,6 +81,16 @@
 		},
 		methods: {
 			fenye(pageNum) {
+				//根据登录用户的权限 分页
+				if(this.$getSessionStorage("sysUser").userRoleId==1||this.$getSessionStorage("sysUser").userRoleId==4){
+					return;
+				}
+				if(this.$getSessionStorage("sysUser").userRoleId==2){
+					
+				}
+				if(this.$getSessionStorage("sysUser").userRoleId==3){
+					this.params.chanceDueId=this.$getSessionStorage("sysUser").userId;
+				}
 				this.$fenye('selectSaleChanceCount', 'selectSaleChancePaging', this.params, pageNum, this.$store.state.maxPageNum,
 					(response) => {
 						this.result = response;
@@ -103,15 +116,14 @@
 				return row.chanceDueId == this.$getSessionStorage('sysUser').userId;
 			},
 			//跳转制定计划界面
-			salePlanFormulateView(saleChance) {
-				 console.log(saleChance)
-				//this.$setSessionStorage('chanceId', chanceId)
-				//this.$router.push('/admin/saleplanformulateview');
+			salePlanFormulateView(saleChance) {			
+				this.$setSessionStorage('chanceId', saleChance.chanceId)
+				this.$router.push('/admin/saleplanformulateview');
 			},
 			//跳转执行计划界面
-			salePlanExecuteView(chanceId) {
-				this.$setSessionStorage("chanceId", chanceId);
-				this.$router.push('UpdateSaleChance');
+			salePlanExecuteView(saleChance) {
+				this.$setSessionStorage("chanceId",saleChance.chanceId);
+				this.$router.push('/admin/saleplanexecuteview');
 			},
 			// 开发成功
 			developsuc(saleChance) {
@@ -119,14 +131,14 @@
 					return;
 				}
 				this.$setSessionStorage('chanceId',saleChance.chanceId);
-				console.log("---");
+				
 				//创建当前客户的客户信息表方法
 				this.createClientInfo(saleChance);
-				console.log("111");
+				
 				//创建当前客户的联系人表的方法
 				this.createClientLinkman(saleChance);
+				
 				//更改销售机会状态为 开发成功
-				console.log("222");
 				saleChance.chanceStatus = 2;
 				this.$axios.post('updateSaleChance',saleChance)
 					.then((response) => {
@@ -140,22 +152,20 @@
 						console.log(error);
 					})
 				this.fenye(1);
-
 			},
 			// 封装  创建当前客户的客户信息表方法
 			createClientInfo(saleChance){
-				
-				this.clientInfo.clientCode = this.createClientCode(saleChance.chanceId);
-				
+				//赋值参数
+				this.clientInfo.clientCode=this.createClientCode(saleChance.chanceId);
 				this.clientInfo.clientName = saleChance.chanceCustName;
-				this.clientInfo.clientCustId=0;
+				this.clientInfo.clientCustId=saleChance.chanceDueId;
+
 				this.$axios.post('insertClientInfo', this.clientInfo)
 					.then((response) => {
 						if (response.data == 1) {
 							console.log("客户信息表成功")
 						} else {
 							alert('发生错误');
-							
 						}
 					})
 					.catch((error) => {
@@ -164,23 +174,25 @@
 			},
 			// 封装  创建当前客户的联系人表的方法
 			createClientLinkman(saleChance){
-				// 给参数赋值
+				//赋值参数
+				//联系人名字
 				this.clientLinkman.clientLinkmanName=saleChance.chanceLinkman;
 				if(saleChance.chanceLinkman==''){
 					this.clientLinkman.clientLinkmanName='暂无';
 				}
+				//联系人性别
 				this.clientLinkman.clientLinkmanSex=0;
+				//联系人电话
 				this.clientLinkman.clientLinkmanTel=saleChance.chanceTel;
 				if(saleChance.clientLinkmanTel==''){
 					this.clientLinkman.clientLinkmanTel='暂无';
 				}
+				//联系人职位
 				this.clientLinkman.clientLinkmanJob='暂无';
-				this.createClientCode(saleChance.chanceId);
-				
-				//this.clientLinkman.clientCode=this.createClientCode(saleChance.chanceId);
-				console.log("aaaa11");
-				console.log(saleChance);
-				this.$axios.post('insertClientInfo', this.clientInfo)
+				//客户编号
+				this.clientLinkman.clientCode=this.createClientCode(saleChance.chanceId);
+			
+				this.$axios.post('insertClientLinkman', this.clientLinkman)
 					.then((response) => {
 						if (response.data == 1) {
 						console.log("联系人表成功");
@@ -191,7 +203,6 @@
 					.catch((error) => {
 						console.log(error);
 					})
-				
 			},
 			// 当前页码改变时触发分页 
 			handleCurrentChange(val) {
@@ -210,19 +221,12 @@
 				} else {
 					number = chanceId.toString().slice(0, 3);
 				}
-				console.log("ccc");
-				console.log(number);
 				//六位日期数字
 				let time = this.$getCurDate();
 				let year = time.slice(0, 4);
-				let month = time.slice(5, 7);
-				
-				this.clientCode== 'KH' + year + month + number;
-				console.log("lll");
-				console.log(typeof this.clientCode);
-				console.log(this.clientCode);
-			
-			},
+				let month = time.slice(5, 7);			
+				return 'KH' + year + month + number;
+			}
 		}
 	}
 </script>
