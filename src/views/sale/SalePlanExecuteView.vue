@@ -5,9 +5,9 @@
 			<el-breadcrumb-item :to="{ path: '/admin/salechancedeveloplist'}">客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>执行开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-button id="btn" type="primary" size="small" @click="developsuccess()">开发成功</el-button>
+		<el-button id="btn" type="primary" size="small" @click="developsuc(saleChance)">开发成功</el-button>
 		<el-button id="btn" type="primary" size="small" @click="salePlanFormulateView()">制定开发计划</el-button>
-		<el-button id="btn" type="primary" size="small" @click="developfail()">终止开发</el-button>
+		<el-button id="btn" type="primary" size="small" @click="developfail(saleChance)">终止开发</el-button>
 
 		<el-form :inline="true" :model="saleChance" label-width="130px" style="margin-top: 15px;">
 			<el-form-item label="销售机会编号">
@@ -92,13 +92,17 @@
 					planTodo: '',
 					planResult: ''
 				},
-				//此数据用于刷新组件
-				update: true,
+				clientLinkman: {
+					clientLinkmanName: '',
+					clientLinkmanSex: 0,
+					clientLinkmanJob: '',
+					clientLinkmanTel: '',
+					clientCode: ''
+				},
 				clientInfo: {
 					clientCode: '',
 					clientName: '',
 					clientCustId: 0
-
 				}
 			};
 		},
@@ -129,14 +133,94 @@
 		},
 
 		methods: {
+
+			// 开发成功
+			developsuc(saleChance) {
+				if (!confirm('确认开发成功？')) {
+					return;
+				}
+				this.$setSessionStorage('chanceId', saleChance.chanceId);
+
+				//创建当前客户的客户信息表方法
+				this.createClientInfo(saleChance);
+
+				//创建当前客户的联系人表的方法
+				this.createClientLinkman(saleChance);
+
+				//更改销售机会状态为 开发成功
+				saleChance.chanceStatus = 2;
+				this.$axios.post('updateSaleChance', saleChance)
+					.then((response) => {
+						if (response.data == 1) {
+							console.log("销售机会表成功")
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+				this.$router.push('/admin/salechancedeveloplist');
+			},
+			// 封装  创建当前客户的客户信息表方法
+			createClientInfo(saleChance) {
+				//赋值参数
+				this.clientInfo.clientCode = this.createClientCode(saleChance.chanceId);
+				this.clientInfo.clientName = saleChance.chanceCustName;
+				this.clientInfo.clientCustId = saleChance.chanceDueId;
+
+				this.$axios.post('insertClientInfo', this.clientInfo)
+					.then((response) => {
+						if (response.data == 1) {
+							console.log("客户信息表成功")
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+			},
+			// 封装  创建当前客户的联系人表的方法
+			createClientLinkman(saleChance) {
+				//赋值参数
+				//联系人名字
+				this.clientLinkman.clientLinkmanName = saleChance.chanceLinkman;
+				if (saleChance.chanceLinkman == '') {
+					this.clientLinkman.clientLinkmanName = '暂无';
+				}
+				//联系人性别
+				this.clientLinkman.clientLinkmanSex = 0;
+				//联系人电话
+				this.clientLinkman.clientLinkmanTel = saleChance.chanceTel;
+				if (saleChance.clientLinkmanTel == '') {
+					this.clientLinkman.clientLinkmanTel = '暂无';
+				}
+				//联系人职位
+				this.clientLinkman.clientLinkmanJob = '暂无';
+				//客户编号
+				this.clientLinkman.clientCode = this.createClientCode(saleChance.chanceId);
+
+				this.$axios.post('insertClientLinkman', this.clientLinkman)
+					.then((response) => {
+						if (response.data == 1) {
+							console.log("联系人表成功");
+						} else {
+							alert('发生错误');
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+			},
+			// 生成客户编号（KH + 六位日期数字 + 三位数字流水号）
 			createClientCode(chanceId) {
-				//客户编号（KH + 六位日期数字 + 三位数字流水号）
 				//3位流水号
 				let number;
 				if (chanceId < 10) {
 					number = '00' + chanceId;
 				} else if (chanceId < 100) {
-					number = '0' + this.saleChance.chanceId;
+					number = '0' + chanceId;
 				} else if (chanceId < 1000) {
 					number = chanceId;
 				} else {
@@ -146,56 +230,19 @@
 				let time = this.$getCurDate();
 				let year = time.slice(0, 4);
 				let month = time.slice(5, 7);
-
 				return 'KH' + year + month + number;
-
-			},
-			// 开发成功
-			developsuccess() {
-				if (!confirm('确认开发成功？')) {
-					return;
-				}
-				//在用户信息表新增一条记录
-				this.clientInfo.clientCode = this.createClientCode(this.saleChance.chanceId);
-				this.clientInfo.clientName = this.saleChance.chanceCustName;
-				this.$axios.post('insertClientInfo', this.clientInfo)
-					.then((response) => {
-						if (response.data == 1) {
-					
-						} else {
-							alert('发生错误');
-						}
-					})
-					.catch((error) => {
-						console.log(error);
-					})
-				//更改销售机会状态为 开发成功
-				this.saleChance.chanceStatus = 2;
-				this.$axios.post('updateSaleChance', this.saleChance)
-					.then((response) => {
-						if (response.data == 1) {
-							this.$router.push('/admin/salechancelist');
-						} else {
-							alert('发生错误');
-						}
-					})
-					.catch((error) => {
-						console.log(error);
-					})
-
 			},
 			//开发失败
-			developfail() {
+			developfail(saleChance) {
 				if (!confirm('确认开发失败？')) {
 					return;
 				}
-
 				//更改销售机会状态为 开发失败
 				this.saleChance.chanceStatus = 3;
-				this.$axios.post('updateSaleChance', this.saleChance)
+				this.$axios.post('updateSaleChance', saleChance)
 					.then((response) => {
 						if (response.data == 1) {
-							this.$router.push('/admin/salechancelist');
+							this.$router.push('/admin/salechancedeveloplist');
 						} else {
 							alert('发生错误');
 						}
@@ -222,18 +269,19 @@
 						arr.splice(i, 1);
 					}
 				}
-				this.numberarr=arr;
+				this.numberarr = arr;
 			},
 			//修改销售计划执行结果
 			updateSalePlan(item, index) {
-				if (item.planResult == null) {
-					alert(执行效果不能更改为空);
+				if (item.planResult == null || item.planResult == '') {
+					alert('执行效果不能更改为空');
+					return;
 				}
 				this.$axios.post('updateSalePlan', item)
 					.then((response) => {
 						if (response.data == 1) {
 							//console.log(this.numberarr);
-							alert('修改成功');
+							alert('保存成功');
 							this.removenum(this.numberarr, index);
 							//重新得到数据
 							this.$axios.post('selectSalePlanByCondition', {
@@ -241,10 +289,8 @@
 								})
 								.then((response) => {
 									console.log(response);
-									//测试
-									this.$set(this.salePlan.list,index,response.data[0]);
-									//this.salePlan.list[index] = response.data[0];
-									console.log(this.salePlan);
+									//此方法可以避免再次修改input中内容时 input输入框无法操作的问题
+									this.$set(this.salePlan.list, index, response.data[0]);
 								})
 								.catch((error) => {
 									console.log(error);
@@ -258,10 +304,8 @@
 					})
 			},
 
-		},
-		mounted () {
-		　　this.$set(this.student,"age", 24)
 		}
+
 	}
 </script>
 
