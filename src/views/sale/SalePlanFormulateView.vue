@@ -115,7 +115,7 @@
 		methods: {
 			//封装 获取销售计划的方法
 			getSalePlan() {
-				this.$axios.post('selectSalePlanByPlanChcId', {
+				this.$axios.post('selectSalePlanByCondition', {
 						planChcId: this.$getSessionStorage("chanceId")
 					})
 					.then((response) => {
