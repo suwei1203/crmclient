@@ -10,7 +10,7 @@
 				<el-aside width="200px">
 					<!-- router属性   激活导航时以 index 作为 path 进行路由跳转-->
 					<el-menu router class="el-menu-vertical-demo" background-color="#D3DCE6" active-text-color="#777">
-						<el-submenu>
+						<el-submenu index="1">
 							<!-- 分组标签 -->
 							<template slot="title">
 								<span>营销管理</span>
