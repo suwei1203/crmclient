@@ -162,6 +162,42 @@ function fenye(countUrl, dataUrl, dataParam, pageNum, maxPageNum, callback) {
 
 Vue.prototype.$fenye = fenye;
 
+router.beforeEach(function(to, from, next) {
+	const nextRoute = [
+		'/admin',
+		'/admin/insertsalechance',
+		'/admin/updatesalechance',
+		'/admin/salechancelist',
+		'/admin/appointsalechance',
+		'/admin/salechancedeveloplist',
+		'/admin/saleplanformulateview',
+		'/admin/saleplanexecuteview'
+	];
+	const nextRoute2 = [
+		'/admin/insertsalechance',
+		'/admin/updatesalechance',
+		'/admin/salechancelist',
+		'/admin/appointsalechance',
+		'/admin/salechancedeveloplist',
+		'/admin/saleplanformulateview',
+		'/admin/saleplanexecuteview'
+	];
+	let sysUser =  sessionStorage.getItem('sysUser');
+	if (sysUser == null && nextRoute.indexOf(to.path) >= 0) {
+		router.push('/login');
+		location.reload();
+	}
+	//有问题待修改
+	// else if(nextRoute2.indexOf(to.path) >= 0 && (sysUser.userRoleId != 2 &&sysUser.userRoleId != 3)) {
+	// 	console.log("haha");
+	// 	console.log(ppp);
+	// 	router.push('/admin');
+	// 	location.reload();
+	// }
+	
+	next();
+});
+
 new Vue({
 	router,
 	store,
