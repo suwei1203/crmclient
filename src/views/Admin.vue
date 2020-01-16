@@ -9,14 +9,14 @@
 			<el-container>
 				<el-aside width="200px">
 					<!-- router属性   激活导航时以 index 作为 path 进行路由跳转-->
-					<el-menu router class="el-menu-vertical-demo" background-color="#D3DCE6" active-text-color="#777">
+					<el-menu id="menu" router class="el-menu-vertical-demo" background-color="#D3DCE6" active-text-color="#777">
 						<el-submenu index="1">
 							<!-- 分组标签 -->
 							<template slot="title">
 								<span>营销管理</span>
 							</template>
-							<el-menu-item index="/admin/salechancelist">销售机会管理</el-menu-item>
-							<el-menu-item index='/admin/salechancedeveloplist'>客户开发计划</el-menu-item>
+							<el-menu-item ><el-button  @click="jumpSaleChanceList()" type="text" size="medium">销售机会管理</el-button></el-menu-item>
+							<el-menu-item ><el-button  @click="jumpSaleChanceDevelopList()" type="text" size="medium">客户开发计划</el-button></el-menu-item>
 						</el-submenu>
 						<el-submenu index="2">
 							<template slot="title">
@@ -62,12 +62,27 @@
 				this.$removeSessionStorage('sysUser');
 				this.$removeSessionStorage('chanceId');
 				this.$router.push('/login');
+			},
+			jumpSaleChanceList(){
+				if(this.$getSessionStorage('sysUser').userRoleId==2||this.$getSessionStorage('sysUser').userRoleId==3){
+					this.$router.push('/admin/salechancelist');
+				}else{
+					alert('您权限不足,不能访问');
+				}
+				
+			},
+			jumpSaleChanceDevelopList(){
+				if(this.$getSessionStorage('sysUser').userRoleId==2||this.$getSessionStorage('sysUser').userRoleId==3){
+					this.$router.push('/admin/salechancedeveloplist');
+				}else{
+					alert('您权限不足,不能访问');
+				}
 			}
 		}
 	}
 </script>
 
-<style>
+<style >
 	html,
 	body {
 		margin: 0;
@@ -113,5 +128,8 @@
 	}
 	.el-link{
 		font-size: 16px;
+	}
+	.el-menu-item{
+		padding-left: -40px;
 	}
 </style>
