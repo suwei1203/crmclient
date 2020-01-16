@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/admin/salechancelist'}">销售机会管理</el-breadcrumb-item>
+			<el-breadcrumb-item>销售机会管理</el-breadcrumb-item>
 			<el-breadcrumb-item>创建销售机会</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button type="primary" size="small" @click="insertSaleChance()">创建</el-button>
@@ -37,7 +37,7 @@
 			<el-form-item label="创建时间">
 				<el-input v-model="saleChance.chanceCreateDate" disabled></el-input>
 			</el-form-item>
-			
+
 		</el-form>
 	</div>
 </template>
@@ -83,13 +83,16 @@
 				if (this.saleChance.chanceCustName == '') {
 					alert('客户名称不能为空！');
 					return;
-				}
-				if (this.saleChance.chanceRate == '' || isNaN(this.saleChance.chanceRate) || (this.saleChance.chanceRate > 100 ||
-						this.saleChance.chanceRate < 0)) {
-					alert('成功概率不能为空并且为0-100数字！');
+				} else if (this.saleChance.chanceRate == '') {
+					alert('成功概率不能为空!');
 					return;
-				}
-				if (this.saleChance.chanceTitle == '') {
+				} else if (isNaN(this.saleChance.chanceRate)) {
+					alert('成功概率不能含非数字!');
+					return;
+				} else if (this.saleChance.chanceRate > 100 || this.saleChance.chanceRate < 0) {
+					alert('成功概率必须在0-100之间！');
+					return;
+				} else if (this.saleChance.chanceTitle == '') {
 					alert('概要不能为空！');
 					return;
 				}
@@ -116,7 +119,18 @@
 
 	.el-button {
 		margin-top: 30px;
-		margin-bottom: 10px;
 		margin-left: 40px;
+	}
+	.el-form{
+		margin-top: 10px;
+	}
+	/*input 输入框和文本域输入的字体不一样   这里让它统一字体*/
+	.el-textarea__inner{
+	 font-family:"Microsoft";
+	 font-size:20px;
+	}
+	.el-input__inner{
+		font-family:"Microsoft";
+		font-size:20px;
 	}
 </style>
