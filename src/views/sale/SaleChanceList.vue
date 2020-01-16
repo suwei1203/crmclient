@@ -16,18 +16,19 @@
 				<el-input v-model="params.chanceLinkman"></el-input>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary" @click="selectSaleChanceByConditions()">查询</el-button>
+				<el-button size="small" type="warning" @click="clearConditions()">清空</el-button>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="warning" @click="clearConditions()">清空</el-button>
+				<el-button size="small" type="primary" @click="selectSaleChanceByConditions()">查询</el-button>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="success" @click="insertSaleChanceView()">新建</el-button>
+				<el-button size="small" type="success" @click="insertSaleChanceView()">新建</el-button>
 			</el-form-item>
 		</el-form>
 		<!-- :data= 绑定的为结果集  后续prop中只写属性名即可 -->
-		<el-table :data="result.data" stripe style="width: 100%">
-			<el-table-column prop="chanceId" label="编号" width="180">
+		<!-- :cell-style 调整单元格高度 缩小到最小高度不能再缩时才加-->
+		<el-table :data="result.data" stripe style="width: 100%" size="mini"  :cell-style="{padding:'2px'}">
+			<el-table-column prop="chanceId" label="编号" width="80">
 			</el-table-column>
 			<el-table-column prop="chanceCustName" label="客户名称" width="250">
 			</el-table-column>
@@ -139,8 +140,16 @@
 </script>
 
 <style>
-	.demo-form-inline {
-		margin-top: 15px;
-		margin-bottom: 10px;
+	
+	.el-pagination{
+		margin-top: 12px;
 	}
+	.demo-form-inline{
+		margin-top: 15px;
+	}
+	/* .el-button--medium{
+		padding-top: 0px;
+		padding-bottom: 0px;
+	} */
+
 </style>
