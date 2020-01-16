@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/admin/salechancelist'}">销售机会管理</el-breadcrumb-item>
+			<el-breadcrumb-item>销售机会管理</el-breadcrumb-item>
 			<el-breadcrumb-item>修改销售机会</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button type="primary" size="small" @click="updateSaleChance()">保存</el-button>
