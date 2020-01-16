@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/admin/salechancedeveloplist'}">客户开发计划</el-breadcrumb-item>
+			<el-breadcrumb-item>客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>执行开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button id="btn" type="primary" size="small" @click="developsuc(saleChance)">开发成功</el-button>
