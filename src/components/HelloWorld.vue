@@ -1,6 +1,6 @@
 <template>
 	<div id="hello">
-		<p>欢迎</p>
+		<p>欢迎使用本系统</p>
 	</div>
 </template>
 
