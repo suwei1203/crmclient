@@ -2,7 +2,7 @@
 	<div>
 		<el-breadcrumb separator-class="el-icon-arrow-right">
 			<el-breadcrumb-item>营销管理</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/admin/salechancedeveloplist'}">客户开发计划</el-breadcrumb-item>
+			<el-breadcrumb-item>客户开发计划</el-breadcrumb-item>
 			<el-breadcrumb-item>制定开发计划</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-button v-show="isExecute()" id="btn" type="primary" size="small" @click="salePlanExecuteView(saleChance.chanceId)">执行开发计划</el-button>
