@@ -15,14 +15,15 @@
 				<el-input v-model="params.chanceLinkman"></el-input>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary" @click="selectSaleChanceByConditions()">查询</el-button>
-			</el-form-item>
-			<el-form-item>
 				<el-button type="warning" @click="clearConditions()">清空</el-button>
 			</el-form-item>
+			<el-form-item>
+				<el-button type="primary" @click="selectSaleChanceByConditions()">查询</el-button>
+			</el-form-item>
+			
 		</el-form>
-		<el-table :data="result.data" stripe style="width: 100%">
-			<el-table-column prop="chanceId" label="编号" width="180">
+		<el-table :data="result.data" stripe style="width: 100%" size="mini" row-style="height:10px" :cell-style="{padding:'2px'}">
+			<el-table-column prop="chanceId" label="编号" width="80">
 			</el-table-column>
 			<el-table-column prop="chanceCustName" label="客户名称" width="250">
 			</el-table-column>
@@ -232,8 +233,5 @@
 </script>
 
 <style>
-	.demo-form-inline {
-		margin-top: 15px;
-		margin-bottom: 10px;
-	}
+	
 </style>
